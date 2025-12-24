@@ -1,0 +1,77 @@
+---
+- name: Verificar espaço em disco disponível
+  command: df -h /
+  register: disk_space_before
+  changed_when: false
+
+- name: Mostrar espaço em disco antes da limpeza
+  debug:
+    msg: "Espaço em disco antes da limpeza: {{ (disk_space_before.stdout_lines | select('match', '^/dev/') | list | first) | default('N/A') }}"
+
+- name: Limpar cache do APT
+  apt:
+    autoclean: yes
+    autoremove: yes
+    update_cache: no
+
+- name: Verificar se Docker está instalado
+  command: which docker
+  register: docker_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Limpar imagens e containers Docker não utilizados
+  shell: docker system prune -af --volumes
+  ignore_errors: yes
+  when: docker_check.rc == 0
+
+- name: Limpar arquivos temporários antigos
+  shell: find /tmp -type f -atime +7 -delete
+  ignore_errors: yes
+
+- name: Limpar logs antigos do sistema
+  shell: journalctl --vacuum-time=3d
+  ignore_errors: yes
+
+- name: Verificar espaço em disco após limpeza
+  command: df -h /
+  register: disk_space_after
+  changed_when: false
+
+- name: Mostrar espaço em disco após limpeza
+  debug:
+    msg: "Espaço em disco após limpeza: {{ (disk_space_after.stdout_lines | select('match', '^/dev/') | list | first) | default('N/A') }}"
+
+- name: Verificar se há espaço suficiente (mínimo 500MB)
+  shell: |
+    AVAILABLE=$(df / | tail -1 | awk '{print $4}')
+    MIN_REQUIRED={{ k3s_min_disk_space_kb }}
+    if [ "$AVAILABLE" -lt "$MIN_REQUIRED" ]; then
+      echo "Espaço insuficiente. Disponível: ${AVAILABLE}KB, Requerido: ${MIN_REQUIRED}KB"
+      exit 1
+    fi
+    echo "Espaço suficiente disponível: ${AVAILABLE}KB"
+  register: space_check
+  failed_when: space_check.rc != 0
+
+- name: Baixar e rodar o instalador do K3s
+  shell: curl -sfL https://get.k3s.io | sh -
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Esperar o nó ficar pronto
+  shell: k3s kubectl get nodes
+  register: nodes_output
+  until: '" Ready " in nodes_output.stdout'
+  retries: "{{ k3s_retries }}"
+  delay: "{{ k3s_delay }}"
+
+- name: Ajustar permissões do config do Kubernetes
+  file:
+    path: /etc/rancher/k3s/k3s.yaml
+    mode: "{{ k3s_config_mode }}"
+
+- name: Mostrar status do cluster
+  debug:
+    msg: "Cluster K3s rodando! Pronto para receber seus Jobs."
+

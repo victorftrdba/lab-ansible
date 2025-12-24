@@ -1,0 +1,6 @@
+---
+# Variáveis para o grupo ubuntu_servers
+
+# Configurações de usuário
+ansible_user: ubuntu
+

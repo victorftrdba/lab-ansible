@@ -1,0 +1,40 @@
+# Ansible
+*.retry
+.ansible/
+ansible.log
+*.log
+
+# Arquivos sensíveis
+*.pem
+*.key
+*.crt
+secrets.yml
+vault.yml
+vault_pass.txt
+
+# Arquivos temporários
+*.tmp
+*.swp
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de backup
+*.bak
+*.backup
+

@@ -1,0 +1,16 @@
+---
+# Playbook principal - Deploy completo
+# Este playbook executa a configuração completa do servidor e instalação do K3s
+
+- name: Preparar Servidor de Dados
+  hosts: ubuntu_servers
+  become: yes
+  roles:
+    - common
+
+- name: Instalar Kubernetes K3s
+  hosts: ubuntu_servers
+  become: yes
+  roles:
+    - k3s
+

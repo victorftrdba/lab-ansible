@@ -1,0 +1,7 @@
+---
+# Variáveis padrão para a role common
+common_packages:
+  - docker.io
+  - curl
+  - python3-pip
+

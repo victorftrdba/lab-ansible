@@ -1,0 +1,8 @@
+# Configuração do K3s
+# Este arquivo é gerado automaticamente pelo Ansible
+# Modifique as variáveis em group_vars/ ou host_vars/ para personalizar
+
+{% if k3s_config is defined %}
+{{ k3s_config | to_nice_yaml }}
+{% endif %}
+

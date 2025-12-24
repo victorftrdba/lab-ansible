@@ -1,0 +1,41 @@
+---
+- name: Garantir que Python3 está instalado (necessário para módulos do Ansible)
+  raw: |
+    if ! command -v python3 &> /dev/null; then
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update
+      apt-get install -y python3 python3-minimal python3-apt
+    fi
+  become: yes
+  changed_when: false
+
+- name: Atualizar o cache do APT
+  apt:
+    update_cache: yes
+
+- name: Instalar Docker e dependências
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Garantir que o Docker está iniciado e habilitado
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Adicionar usuário ao grupo docker
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Testar se o Docker está respondendo
+  shell: docker ps
+  register: docker_test
+  changed_when: false
+  become: yes
+
+- name: Mostrar resultado do teste do Docker
+  debug:
+    msg: "Docker funcionando! Detalhes: {{ docker_test.stdout }}"

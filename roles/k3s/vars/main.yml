@@ -1,0 +1,7 @@
+---
+# Variáveis padrão para a role k3s
+k3s_min_disk_space_kb: 524288  # 500MB em KB
+k3s_retries: 10
+k3s_delay: 5
+k3s_config_mode: "0644"
+
