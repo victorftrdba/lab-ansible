@@ -5,6 +5,7 @@ Projeto Ansible para automação da configuração de servidores Ubuntu e instal
 ## 📋 Descrição
 
 Este projeto automatiza a configuração completa de servidores Ubuntu, incluindo:
+
 - Instalação e configuração do Docker
 - Instalação e configuração do Kubernetes K3s
 - Limpeza de disco e otimizações do sistema
@@ -150,7 +151,7 @@ As variáveis podem ser configuradas em diferentes níveis (ordem de precedênci
 
 1. **host_vars/** - Variáveis específicas por host (maior precedência)
 2. **group_vars/** - Variáveis por grupo de hosts
-3. **roles/*/vars/main.yml** - Variáveis padrão das roles (menor precedência)
+3. **roles/\*/vars/main.yml** - Variáveis padrão das roles (menor precedência)
 
 #### Variáveis Principais
 
@@ -161,7 +162,7 @@ Edite `group_vars/ubuntu_servers.yml` para personalizar:
 ansible_user: ubuntu
 
 # Espaço mínimo em disco para K3s (em KB)
-k3s_min_disk_space_kb: 524288  # 500MB
+k3s_min_disk_space_kb: 524288 # 500MB
 
 # Tentativas e delay para verificação do K3s
 k3s_retries: 10
@@ -188,6 +189,7 @@ O arquivo `ansible.cfg` contém as configurações principais:
 ### Role: common
 
 Configuração básica do servidor:
+
 - Atualização do sistema
 - Instalação do Docker
 - Instalação de dependências (curl, python3-pip)
@@ -196,6 +198,7 @@ Configuração básica do servidor:
 ### Role: k3s
 
 Instalação e configuração do Kubernetes K3s:
+
 - Limpeza de disco (APT, Docker, logs)
 - Verificação de espaço disponível
 - Instalação do K3s
@@ -206,6 +209,7 @@ Instalação e configuração do Kubernetes K3s:
 ### Problema: Erro de conexão SSH
 
 **Solução:**
+
 ```bash
 # Testar conectividade manualmente
 ssh ubuntu@192.168.100.17
@@ -220,6 +224,7 @@ ansible-playbook site.yml --ask-pass
 ### Problema: Erro de permissão sudo
 
 **Solução:**
+
 ```bash
 # Executar com senha sudo
 ansible-playbook site.yml --ask-become-pass
@@ -231,6 +236,7 @@ ansible all -m shell -a "sudo -n true" --become
 ### Problema: Espaço em disco insuficiente
 
 **Solução:**
+
 - A role k3s limpa automaticamente o disco antes da instalação
 - Se ainda houver problemas, aumente o valor de `k3s_min_disk_space_kb` em `group_vars/ubuntu_servers.yml`
 - Ou limpe manualmente o servidor antes de executar o playbook
@@ -238,6 +244,7 @@ ansible all -m shell -a "sudo -n true" --become
 ### Problema: K3s não inicia
 
 **Solução:**
+
 ```bash
 # Verificar logs do K3s
 ansible all -m shell -a "journalctl -u k3s -n 50" --become
@@ -252,6 +259,7 @@ ansible all -m shell -a "systemctl restart k3s" --become
 ### Problema: Docker não funciona
 
 **Solução:**
+
 ```bash
 # Verificar se o Docker está rodando
 ansible all -m shell -a "systemctl status docker" --become
@@ -350,9 +358,8 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 
 ## 👤 Autor
 
-Victor - [GitHub](https://github.com/victor)
+Victor - [GitHub](https://github.com/victorftrdba)
 
 ---
 
 **Nota**: Este projeto segue as melhores práticas recomendadas pela comunidade Ansible para organização e estruturação de projetos.
-
